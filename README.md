@@ -1,23 +1,23 @@
 ![Education Protocol](./assets/images/bg.png "Education Protocol")
 
 - [Education Protocol](#education-protocol)
-  - [What is Education Protocol?](#what-is-education-protocol)
+  - [Overview of Education Protocol](#overview-of-education-protocol)
   - [How this works?](#how-this-works)
     - [Education Profile](#education-profile)
     - [Education Organization (Knowledge Provider)](#education-organization-knowledge-provider)
     - [Education Certificates](#education-certificates)
     - [Education Protocol Role](#education-protocol-role)
-  - [TODO](#todo)
+  - [Development Roadmap](#development-roadmap)
 
 # Education Protocol
 
-> Warning! The current version of Education Protocol is currently undergoing a **security audit** and we do not recommend using it.
+> **Warning!** The current version of the Education Protocol is undergoing a **security audit**. We do not recommend using it in production environments.
 >
-> This source code posted here for informational purposes only and should not be used on production.
+> The source code is provided here for informational purposes only.
 
-## What is Education Protocol?
+## Overview of Education Protocol
 
-Education Protocol this is protocol that storage for education certificates based on smart contracts that can be easy to integrate with any source of getting knowledge.
+The Education Protocol is a decentralized system for storing educational certificates using smart contracts. It is designed for easy integration with any knowledge dissemination platform.
 
 ## How this works?
 
@@ -31,17 +31,13 @@ This is a single profile for any course, educational program or other source of 
 
 ### Education Organization (Knowledge Provider)
 
-Any source of knowledge can be registered as an Education Organization on Education Protocol, for example:
+Various entities can register as Education Organizations on the Education Protocol. Examples include:
 
-- Blog
-- Chat in messenger
-- Site with courses
-- Educational institution
-- AI
-
-and so on...
-
-> For register as Education Organization you should pay registration fee. More information about this you can find on site.
+- Blogs
+- Chat groups in messengers
+- Online course platforms
+- Educational institutions
+- AI-driven learning tools
 
 To register, you must have a smart contract that will be used as an account for an educational organization and all management of the issuance of certificates will occur from the address of this smart contract.
 We provide a basic smart contract that can be used to get started quickly. In addition, we will add the ability to quickly launch a project directly from our website.
@@ -58,16 +54,16 @@ The issued certificates can be either general or contain notes on individual kno
 
 ### Education Protocol Role
 
-The role of Education Protocol in the project is to provide convenient tools for issuing and monitoring certificates, following standards and preventing fraudulent actions on the part of organizations or users.
+The Education Protocol's role is to facilitate the issuance and management of educational certificates, ensuring standards are met and preventing fraud.
 
 We provide:
 
-- SDK for painless integration of your website or CRM
-- Tools for working with students
-- Tools for issuing, managing and validating certificates
-- New opportunities for integration with blockchain, analytics and process automation
+- An SDK for seamless integration with websites or CRMs.
+- Tools for student engagement and management.
+- Systems for issuing, managing, and validating certificates.
+- Opportunities for blockchain integration, analytics, and process automation.
 
-## TODO
+## Development Roadmap
 
-- [ ] Tests
-- [ ] Security Audit
+- [ ] Conduct additional testing.
+- [ ] Complete the security audit.
