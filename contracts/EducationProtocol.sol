@@ -20,7 +20,7 @@ import "contracts/interfaces/IWorldID.sol";
 contract EducationProtocol is BaseEducationProtocol, IEducationProtocol {
     using ByteHasher for bytes;
 
-    uint256 private REGISTRATION_FEE = 0.1 ether;
+    uint256 private REGISTRATION_FEE;
 
     mapping(NFTType => string) defaultMetadataUri;
     mapping(uint256 => address) organizationIdToAddress;
@@ -37,7 +37,7 @@ contract EducationProtocol is BaseEducationProtocol, IEducationProtocol {
         defaultMetadataUri[nftType] = metadataUri;
     }
 
-    function setRegistractionFee(uint256 fee) external onlyRole(UPGRADER_ROLE) {
+    function setRegistrationFee(uint256 fee) external onlyRole(UPGRADER_ROLE) {
         REGISTRATION_FEE = fee;
     }
 

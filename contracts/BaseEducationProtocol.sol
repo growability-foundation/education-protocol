@@ -23,11 +23,11 @@ abstract contract BaseEducationProtocol is Initializable, PausableUpgradeable, A
     uint256 internal externalNullifier;
 
     /// @dev The World ID group ID (always 1)
-    uint256 internal groupId = 1;
+    uint256 internal groupId;
 
     /// @dev Whether a nullifier hash has been used already. Used to guarantee an action is only performed once by a single person
     mapping(uint256 => bool) internal nullifierHashes;
-    
+
     address public organizationNftAddress;
     address public certificateNftAddress;
     address public profileNftAddress;
@@ -48,6 +48,8 @@ abstract contract BaseEducationProtocol is Initializable, PausableUpgradeable, A
         _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
         _grantRole(PAUSER_ROLE, defaultAdmin);
         _grantRole(UPGRADER_ROLE, defaultAdmin);
+
+        groupId = 1;
     }
 
     function pause() public onlyRole(PAUSER_ROLE) {
