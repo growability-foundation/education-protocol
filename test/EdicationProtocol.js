@@ -1,123 +1,73 @@
-const {
-  time,
-  loadFixture,
-} = require('@nomicfoundation/hardhat-toolbox/network-helpers');
-const { anyValue } = require('@nomicfoundation/hardhat-chai-matchers/withArgs');
-const { expect } = require('chai');
+const { time, loadFixture } = require("@nomicfoundation/hardhat-toolbox/network-helpers")
+const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs")
+const { expect } = require("chai")
 
-describe('Education Protocol', function () {
-  const deploymentEducationProtocolFixture = async function () {
-    const signers = await ethers.getSigners();
-    const adminAddress = signers[0].address;
+describe("Education Protocol", function () {
+    const deployingNFTsFixture = async function () {
+        const signers = await ethers.getSigners()
+        const adminAddress = signers[0].address
 
-    const EducationProtocol = await ethers.getContractFactory(
-      'EducationProtocol',
-      [adminAddress]
-    );
+        // Deploying EducationCertificate NFT contract
+        const EducationCertificateNFT = await ethers.getContractFactory("EducationCertificateNFT")
+        const educationCertificateNFT = await upgrades.deployProxy(EducationCertificateNFT, [
+            adminAddress,
+        ])
+        await educationCertificateNFT.waitForDeployment()
 
-    const educationProtocol = await EducationProtocol.deploy();
-    await educationProtocol.deployed();
-    return { educationProtocol };
-  };
+        // Deployment of the EducationOrganization NFt contract
+        const EducationOrganizationNFT = await ethers.getContractFactory("EducationOrganizationNFT")
+        const educationOrganizationNFT = await upgrades.deployProxy(EducationOrganizationNFT, [
+            adminAddress,
+        ])
+        await educationOrganizationNFT.waitForDeployment()
 
-  describe('Deployment', function () {
-    it('Check roles', async function () {
-      const { educationProtocol } = await loadFixture(
-        deploymentEducationProtocolFixture
-      );
+        // Deployment of the EducationProfile contract
+        const EducationProfileNFT = await ethers.getContractFactory("EducationProfileNFT")
+        const educationProfileNFT = await upgrades.deployProxy(EducationProfileNFT, [adminAddress])
+        await educationProfileNFT.waitForDeployment()
 
-      educationProtocol.
-    });
+        return { educationCertificateNFT, educationOrganizationNFT, educationProfileNFT }
+    }
 
-    it('Should set the right owner', async function () {
-      const { lock, owner } = await loadFixture(deployOneYearLockFixture);
+    const deploymentEducationProtocolFixture = async function () {
+        const signers = await ethers.getSigners()
+        const adminAddress = signers[0].address
 
-      expect(await lock.owner()).to.equal(owner.address);
-    });
+        // Deployment of the EducationProtocol contract
+        const EducationProtocol = await ethers.getContractFactory("EducationProtocol")
+        const educationProtocol = await upgrades.deployProxy(EducationProtocol, [adminAddress])
+        await educationProtocol.waitForDeployment()
 
-    it('Should receive and store the funds to lock', async function () {
-      const { lock, lockedAmount } = await loadFixture(
-        deployOneYearLockFixture
-      );
+        const transaction = await educationProtocol.setRegistrationFee("1000000000000000000") // 1 ETH
+        await transaction.wait()
 
-      expect(await ethers.provider.getBalance(lock.target)).to.equal(
-        lockedAmount
-      );
-    });
+        // Deployment nfts
+        const { educationCertificateNFT, educationOrganizationNFT, educationProfileNFT } =
+            await loadFixture(deployingNFTsFixture)
 
-    it('Should fail if the unlockTime is not in the future', async function () {
-      // We don't use the fixture here because we want a different deployment
-      const latestTime = await time.latest();
-      const Lock = await ethers.getContractFactory('Lock');
-      await expect(Lock.deploy(latestTime, { value: 1 })).to.be.revertedWith(
-        'Unlock time should be in the future'
-      );
-    });
-  });
+        // Associate the EducationCertificate contract with the EducationProtocol contract
+        await educationProtocol.setEducationCertificateNFT(educationCertificateNFT.target)
 
-  describe('Withdrawals', function () {
-    describe('Validations', function () {
-      it('Should revert with the right error if called too soon', async function () {
-        const { lock } = await loadFixture(deployOneYearLockFixture);
+        // Associate the EducationOrganization contract with the EducationProtocol contract
+        await educationProtocol.setEducationOrganizationNFT(educationOrganizationNFT.target)
 
-        await expect(lock.withdraw()).to.be.revertedWith(
-          "You can't withdraw yet"
-        );
-      });
+        // Associate the EducationProfile contract with the EducationProtocol contract
+        await educationProtocol.setEducationProfileNFT(educationProfileNFT.target)
 
-      it('Should revert with the right error if called from another account', async function () {
-        const { lock, unlockTime, otherAccount } = await loadFixture(
-          deployOneYearLockFixture
-        );
+        // Deploy the EducationOrganization contract
+        const EducationOrganization = await ethers.getContractFactory("EducationOrganization")
+        const educationOrganization = await upgrades.deployProxy(EducationOrganization, [
+            educationProtocol.target,
+            adminAddress,
+        ])
+        await educationOrganization.waitForDeployment()
 
-        // We can increase the time in Hardhat Network
-        await time.increaseTo(unlockTime);
+        return { educationProtocol, educationOrganization }
+    }
 
-        // We use lock.connect() to send a transaction from another account
-        await expect(lock.connect(otherAccount).withdraw()).to.be.revertedWith(
-          "You aren't the owner"
-        );
-      });
-
-      it("Shouldn't fail if the unlockTime has arrived and the owner calls it", async function () {
-        const { lock, unlockTime } = await loadFixture(
-          deployOneYearLockFixture
-        );
-
-        // Transactions are sent using the first signer by default
-        await time.increaseTo(unlockTime);
-
-        await expect(lock.withdraw()).not.to.be.reverted;
-      });
-    });
-
-    describe('Events', function () {
-      it('Should emit an event on withdrawals', async function () {
-        const { lock, unlockTime, lockedAmount } = await loadFixture(
-          deployOneYearLockFixture
-        );
-
-        await time.increaseTo(unlockTime);
-
-        await expect(lock.withdraw())
-          .to.emit(lock, 'Withdrawal')
-          .withArgs(lockedAmount, anyValue); // We accept any value as `when` arg
-      });
-    });
-
-    describe('Transfers', function () {
-      it('Should transfer the funds to the owner', async function () {
-        const { lock, unlockTime, lockedAmount, owner } = await loadFixture(
-          deployOneYearLockFixture
-        );
-
-        await time.increaseTo(unlockTime);
-
-        await expect(lock.withdraw()).to.changeEtherBalances(
-          [owner, lock],
-          [lockedAmount, -lockedAmount]
-        );
-      });
-    });
-  });
-});
+    describe("Deployment", function () {
+        it("Check roles", async function () {
+            const { educationProtocol } = await loadFixture(deploymentEducationProtocolFixture)
+        })
+    })
+})
