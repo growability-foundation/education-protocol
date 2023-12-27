@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import "contracts/BaseEducationProtocol.sol";
 
-import "node_modules/@openzeppelin/contracts/interfaces/IERC721.sol";
+import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "contracts/interfaces/IEducationProtocol.sol";
 import "contracts/interfaces/IEducationOrganizationNFT.sol";
 import "contracts/interfaces/IEducationCertificateNFT.sol";
@@ -20,7 +20,7 @@ import "contracts/interfaces/IWorldID.sol";
 contract EducationProtocol is BaseEducationProtocol, IEducationProtocol {
     using ByteHasher for bytes;
 
-    ether private constant REGISTRATION_FEE = 0.1 ether;
+    uint256 private REGISTRATION_FEE = 0.1 ether;
 
     mapping(NFTType => string) defaultMetadataUri;
     mapping(uint256 => address) organizationIdToAddress;
@@ -87,10 +87,7 @@ contract EducationProtocol is BaseEducationProtocol, IEducationProtocol {
         require(addressToOrganizationId[msg.sender] != 0, "EducationProtocol: Only for organization");
 
         // if organization is issuer
-        require(
-            IERC721(certificateNftAddress).ownerOf(certificateId) == msg.sender,
-            "EducationProtocol: Only for issuer"
-        );
+        require(IERC721(certificateNftAddress).ownerOf(certificateId) == msg.sender, "EducationProtocol: Only for issuer");
 
         profileCertificateMetadataUri[profileId][certificateId] = metadataUri;
     }
