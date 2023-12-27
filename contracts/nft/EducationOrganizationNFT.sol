@@ -9,18 +9,15 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721Burnab
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-import "contracts/interfaces/IEducationProfileNFT.sol";
-
 /// @custom:security-contact support@growability.network
-contract EducationProfile is
+contract EducationOrganizationNFT is
     Initializable,
     ERC721Upgradeable,
     ERC721URIStorageUpgradeable,
     ERC721PausableUpgradeable,
     AccessControlUpgradeable,
     ERC721BurnableUpgradeable,
-    UUPSUpgradeable,
-    IEducationProfileNFT
+    UUPSUpgradeable
 {
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
@@ -33,7 +30,7 @@ contract EducationProfile is
     }
 
     function initialize(address defaultAdmin) public initializer {
-        __ERC721_init("Education Profile", "EDP");
+        __ERC721_init("Education Organization", "EDO");
         __ERC721URIStorage_init();
         __ERC721Pausable_init();
         __AccessControl_init();
@@ -54,6 +51,14 @@ contract EducationProfile is
         _unpause();
     }
 
+    function mint(address to, string memory uri) public onlyRole(MINTER_ROLE) returns (uint256) {
+        uint256 tokenId = _nextTokenId++;
+        _safeMint(to, tokenId);
+        _setTokenURI(tokenId, uri);
+
+        return tokenId;
+    }
+
     function _authorizeUpgrade(address newImplementation) internal override onlyRole(UPGRADER_ROLE) {}
 
     // The following functions are overrides required by Solidity.
@@ -70,15 +75,5 @@ contract EducationProfile is
         bytes4 interfaceId
     ) public view override(ERC721Upgradeable, ERC721URIStorageUpgradeable, AccessControlUpgradeable) returns (bool) {
         return super.supportsInterface(interfaceId);
-    }
-
-    // ----
-
-    function mint(address to, string memory uri) external override onlyRole(MINTER_ROLE) returns (uint256) {
-        uint256 tokenId = _nextTokenId++;
-        _safeMint(to, tokenId);
-        _setTokenURI(tokenId, uri);
-
-        return tokenId;
     }
 }

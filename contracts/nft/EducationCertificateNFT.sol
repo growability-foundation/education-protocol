@@ -10,7 +10,15 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 /// @custom:security-contact support@growability.network
-contract EducationCertificate is Initializable, ERC721Upgradeable, ERC721URIStorageUpgradeable, ERC721PausableUpgradeable, AccessControlUpgradeable, ERC721BurnableUpgradeable, UUPSUpgradeable {
+contract EducationCertificateNFT is
+    Initializable,
+    ERC721Upgradeable,
+    ERC721URIStorageUpgradeable,
+    ERC721PausableUpgradeable,
+    AccessControlUpgradeable,
+    ERC721BurnableUpgradeable,
+    UUPSUpgradeable
+{
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
@@ -21,10 +29,8 @@ contract EducationCertificate is Initializable, ERC721Upgradeable, ERC721URIStor
         _disableInitializers();
     }
 
-    function initialize(address defaultAdmin)
-        initializer public
-    {
-        __ERC721_init("Education Organization", "EDO");
+    function initialize(address defaultAdmin) public initializer {
+        __ERC721_init("Education Certificate", "EDC");
         __ERC721URIStorage_init();
         __ERC721Pausable_init();
         __AccessControl_init();
@@ -53,37 +59,21 @@ contract EducationCertificate is Initializable, ERC721Upgradeable, ERC721URIStor
         return tokenId;
     }
 
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        onlyRole(UPGRADER_ROLE)
-        override
-    {}
+    function _authorizeUpgrade(address newImplementation) internal override onlyRole(UPGRADER_ROLE) {}
 
     // The following functions are overrides required by Solidity.
 
-    function _update(address to, uint256 tokenId, address auth)
-        internal
-        override(ERC721Upgradeable, ERC721PausableUpgradeable)
-        returns (address)
-    {
+    function _update(address to, uint256 tokenId, address auth) internal override(ERC721Upgradeable, ERC721PausableUpgradeable) returns (address) {
         return super._update(to, tokenId, auth);
     }
 
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        override(ERC721Upgradeable, ERC721URIStorageUpgradeable)
-        returns (string memory)
-    {
+    function tokenURI(uint256 tokenId) public view override(ERC721Upgradeable, ERC721URIStorageUpgradeable) returns (string memory) {
         return super.tokenURI(tokenId);
     }
 
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        override(ERC721Upgradeable, ERC721URIStorageUpgradeable, AccessControlUpgradeable)
-        returns (bool)
-    {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view override(ERC721Upgradeable, ERC721URIStorageUpgradeable, AccessControlUpgradeable) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 }
