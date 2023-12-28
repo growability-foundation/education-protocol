@@ -1,7 +1,6 @@
 const { deployEducationOrganizationNFT } = require("./nft/deployEducationOrganizationNFT")
 const { deployEducationCertificateNFT } = require("./nft/deployEducationCertificateNFT")
 const { deployEducationProfileNFT } = require("./nft/deployEducationProfileNFT")
-const { deployEducationOrganization } = require("./deployEducationOrganization")
 const { deployEducationProtocol } = require("./deployEducationProtocol")
 
 async function main() {
